@@ -31,6 +31,7 @@
 # include <windows.h>
 #else
 # include <stdio.h>
+# include <sys/stat.h>
 # include <unistd.h>
 #endif
 
@@ -436,6 +437,11 @@ long FileStream::length()
   }
 
 #else
+
+  struct stat st;
+  if ((fstat(fileno(d->file), &st) == 0) && (S_ISREG(st.st_mode))) {
+    return static_cast<long>(st.st_size);
+  }
 
   const long curpos = tell();
 
